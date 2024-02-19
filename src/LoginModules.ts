@@ -11,7 +11,7 @@ import { TokenCache } from './TokenCache';
 export async function doStreamLogin(url: string, tokenCache: TokenCache, username?: string): Promise<StreamSession> {
     logger.info('Launching headless Chrome to perform the OpenID Connect dance...');
 
-    const browser: puppeteer.Browser = await puppeteer.launch({
+    const browser = await puppeteer.launch({
         executablePath: getPuppeteerChromiumPath(),
         headless: false,
         userDataDir: (argv.keepLoginCookies) ? chromeCacheFolder : undefined,
@@ -25,7 +25,7 @@ export async function doStreamLogin(url: string, tokenCache: TokenCache, usernam
 
     // try-finally because we were leaving zombie processes if there was an error
     try {
-        const page: puppeteer.Page = (await browser.pages())[0];
+        const page = (await browser.pages())[0];
 
         logger.info('Navigating to login page...');
         await page.goto(url, { waitUntil: 'load' });
@@ -48,7 +48,7 @@ export async function doStreamLogin(url: string, tokenCache: TokenCache, usernam
             remember the credentials or it could still prompt the user for a password */
         }
 
-        await browser.waitForTarget((target: puppeteer.Target) => target.url().endsWith('microsoftstream.com/'), { timeout: 150000 });
+        await browser.waitForTarget((target) => target.url().endsWith('microsoftstream.com/'), { timeout: 150000 });
         logger.info('We are logged in.');
 
         let session: StreamSession | null = null;
@@ -97,8 +97,8 @@ export async function doShareLogin(url: string, username?: string): Promise<Shar
     let session: ShareSession | null = null;
     const hostname = new URL(url).host;
 
-    const browser: puppeteer.Browser = await puppeteer.launch({
-        executablePath: getPuppeteerChromiumPath(),
+    const browser = await puppeteer.launch({
+        executablePath: '/opt/homebrew/bin/chromium',
         headless: false,
         devtools: argv.verbose,
         userDataDir: (argv.keepLoginCookies) ? chromeCacheFolder : undefined,
@@ -112,7 +112,7 @@ export async function doShareLogin(url: string, username?: string): Promise<Shar
 
     // try-finally because we were leaving zombie processes if there was an error
     try {
-        const page: puppeteer.Page = (await browser.pages())[0];
+        const page = (await browser.pages())[0];
 
         logger.info('Navigating to login page...');
         await page.goto(url, { waitUntil: 'load' });
@@ -137,7 +137,7 @@ export async function doShareLogin(url: string, username?: string): Promise<Shar
 
         logger.info('Waiting for target!');
 
-        await browser.waitForTarget((target: puppeteer.Target) => target.url().startsWith(`https://${hostname}`), { timeout: 150000 });
+        await browser.waitForTarget((target) => target.url().startsWith(`https://${hostname}`), { timeout: 150000 });
         logger.info('We are logged in.');
 
         let tries = 1;

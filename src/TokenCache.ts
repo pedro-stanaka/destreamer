@@ -57,7 +57,7 @@ export class TokenCache {
 export async function refreshSession(url: string): Promise<StreamSession> {
     const videoId: string = url.split('/').pop() ?? process.exit(ERROR_CODE.INVALID_VIDEO_GUID);
 
-    const browser: puppeteer.Browser = await puppeteer.launch({
+    const browser = await puppeteer.launch({
         executablePath: getPuppeteerChromiumPath(),
         headless: false,            // NEVER TRUE OR IT DOES NOT WORK
         userDataDir: chromeCacheFolder,
@@ -68,10 +68,10 @@ export async function refreshSession(url: string): Promise<StreamSession> {
         ]
     });
 
-    const page: puppeteer.Page = (await browser.pages())[0];
+    const page = (await browser.pages())[0];
     await page.goto(url, { waitUntil: 'load' });
 
-    await browser.waitForTarget((target: puppeteer.Target) => target.url().includes(videoId), { timeout: 30000 });
+    await browser.waitForTarget((target) => target.url().includes(videoId), { timeout: 30000 });
 
     let session: StreamSession | null = null;
     let tries = 1;
@@ -96,7 +96,7 @@ export async function refreshSession(url: string): Promise<StreamSession> {
 
             session = null;
             tries++;
-            await page.waitFor(3000);
+            await page.waitForFunction('sessionInfo.AccessToken', { timeout: 30000 });
         }
     }
     browser.close();
